@@ -180,7 +180,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # custom user model
-AUTH_USER_MODEL = 'accounts.CustomUserModel'
+AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # Configure the cors middleware’s behaviour in your Django settings. 
 CORS_ALLOW_ALL_ORIGINS = True

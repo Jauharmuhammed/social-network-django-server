@@ -8,6 +8,7 @@ class CustomUserManager(BaseUserManager):
         if not email:
             raise ValueError('Users must have an email address')
 
+
         user = self.model(
             email=self.normalize_email(email),
             username = username,
@@ -16,6 +17,10 @@ class CustomUserManager(BaseUserManager):
 
         user.set_password(password)
         user.save(using=self._db)
+        user.is_active = True
+        print(user)
+        user.save()
+
         return user
 
     def create_superuser(self, email, username, mobile_number, password=None):
@@ -32,9 +37,9 @@ class CustomUserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-class CustomUserModel(AbstractBaseUser):
+class CustomUser(AbstractBaseUser):
     email = models.EmailField(max_length=255,unique=True)
-    username = models.CharField(max_length=50, unique=True)
+    username = models.CharField(max_length=50, unique=True, blank=True)
     first_name = models.CharField(max_length=50, blank=True)
     last_name = models.CharField(max_length=50, blank=True)
     mobile_number = models.CharField(max_length=10, unique=True, blank=True)
@@ -42,7 +47,7 @@ class CustomUserModel(AbstractBaseUser):
     is_admin = models.BooleanField(default=False) 
     is_superuser = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(auto_now_add=True)
 
     objects = CustomUserManager()
