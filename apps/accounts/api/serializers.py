@@ -27,16 +27,12 @@ class RegisterSerializer(serializers.ModelSerializer):
             required=True,
             validators=[UniqueValidator(queryset=CustomUser.objects.all())]
             )
-    mobile_number = serializers.CharField(
-            validators=[UniqueValidator(queryset=CustomUser.objects.all())]
-            )
-
 
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
 
     class Meta:
         model = CustomUser
-        fields = ('email', 'mobile_number', 'password', )
+        fields = ('email', 'password', )
 
 
     def create(self, validated_data):
@@ -44,10 +40,10 @@ class RegisterSerializer(serializers.ModelSerializer):
         username = email[0].split('@')[0]
 
         try:
+
             user = CustomUser.objects.create(
                 email=validated_data['email'],
                 username=username,
-                mobile_number=validated_data['mobile_number'],
             )
         except:
             random = str(datetime.datetime.now().microsecond)[:4]
@@ -57,7 +53,6 @@ class RegisterSerializer(serializers.ModelSerializer):
             user = CustomUser.objects.create(
                 email=validated_data['email'],
                 username=username,
-                mobile_number=validated_data['mobile_number'],
             )
 
         

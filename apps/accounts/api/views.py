@@ -5,10 +5,22 @@ from .serializers import MyTokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from rest_framework import generics
+from rest_framework import status
 from apps.accounts.models import CustomUser
 from .serializers import UserSerializer, RegisterSerializer
 
 import datetime
+
+
+from django.template.loader import render_to_string
+
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.encoding import force_bytes
+from django.core.mail import send_mail
+from django.contrib.sites.shortcuts import get_current_site
+
+
 
 from google.oauth2 import id_token
 from google.auth.transport.requests import Request as GoogleRequest
@@ -28,11 +40,6 @@ class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
 
-class RegisterView(generics.CreateAPIView):
-    queryset = CustomUser.objects.all()
-    serializer_class = RegisterSerializer
-
-
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
 
@@ -40,6 +47,34 @@ def get_tokens_for_user(user):
         'refresh': str(refresh),
         'access': str(refresh.access_token),
     }
+
+class RegisterView(APIView):
+    def post(self, request):
+        print(request.data)
+
+        serializer = RegisterSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+
+            user = CustomUser.objects.filter(email = serializer.data['email']).first()
+
+            #user activation using email id
+            current_site = get_current_site(request)
+            mail_subject = 'Activation email for your account'
+            message = render_to_string('../templates/account_verification_email.html',{
+                'user' : user,
+                'domain' : current_site,
+                'uid' : urlsafe_base64_encode(force_bytes(user.pk)),
+                'token' : default_token_generator.make_token(user),
+            })
+            to_email = user.email
+            send_mail(mail_subject, message, 'showyourworkonline@gmail.com', [to_email], fail_silently=False)
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class GoogleAuthApiView(APIView):
@@ -82,7 +117,34 @@ class GoogleAuthApiView(APIView):
 
             user.set_password(token)
             user.save()
+            user.is_active = True
+            user.save()
 
         token = get_tokens_for_user(user)
         
         return Response(token)
+
+
+class EmailVerifyView(APIView):
+    def post(self, request):
+        uidb64 = request.data['uidb64']
+        token = request.data['token']
+
+        try:
+            uid = urlsafe_base64_decode(uidb64).decode()
+            user = CustomUser._default_manager.get(pk=uid)
+        except(TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
+            user = None
+
+        if user is not None and default_token_generator.check_token(user, token):
+            user.is_active = True
+            user.save()
+
+            token = get_tokens_for_user(user)
+
+            return Response(token, status=status.HTTP_201_CREATED)
+
+        else:
+          return Response('verification failed', status=status.HTTP_400_BAD_REQUEST)
+
+        
