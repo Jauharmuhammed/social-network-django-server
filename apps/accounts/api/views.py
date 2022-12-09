@@ -142,9 +142,72 @@ class EmailVerifyView(APIView):
 
             token = get_tokens_for_user(user)
 
-            return Response(token, status=status.HTTP_201_CREATED)
+            return Response(token, status=status.HTTP_200_OK)
 
         else:
           return Response('verification failed', status=status.HTTP_400_BAD_REQUEST)
 
+
+
+class ForgotPasswordView(APIView):
+    def post(self, request):
+        email = request.data['email']
+        if CustomUser.objects.filter(email__iexact = email).exists():
+            user = CustomUser.objects.get(email=email)
+            current_site = get_current_site(request)
+            mail_subject = 'Password change request'
+            message = render_to_string('../templates/forgot-password-email.html',{
+                'user' : user,
+                'domain' : current_site,
+                'uid' : urlsafe_base64_encode(force_bytes(user.pk)),
+                'token' : default_token_generator.make_token(user),
+            })
+            to_email = email
+            send_mail(mail_subject, message, 'showyourworkonline@gmail.com', [to_email], fail_silently=False)
+
+            return Response(email, status=status.HTTP_200_OK)
+
+        else:
+            return Response('No account is registered with email id you entered!', status=status.HTTP_400_BAD_REQUEST)
+
+class ForgotPasswordVerifyView(APIView):
+
+    def post(self, request):
+
+        uidb64 = request.data['uidb64']
+        token = request.data['token']
+
+        try:
+            uid = urlsafe_base64_decode(uidb64).decode()
+            user = CustomUser._default_manager.get(pk=uid)
+        except(TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
+            user = None
+
+        if user is not None and default_token_generator.check_token(user, token):
+            
+            return Response(uid, status=status.HTTP_200_OK)
+        else:
+            return Response('Verification failed', status=status.HTTP_401_UNAUTHORIZED)
+
+
+class ResetPasswordView(APIView):
+    def post(self, request):
+        password = request.data['password']
+        confirm_password = request.data['confirm_password']
+        uid = request.data['uid']
+
+
+        try:
+            if password == confirm_password:
+                user = CustomUser.objects.get(pk=uid)
+                user.set_password(password)
+                user.save()
+                return Response('Password changed successfully', status=status.HTTP_200_OK)
+            else:
+                return Response('Passwords does not match', status=status.HTTP_400_BAD_REQUEST)
         
+        except:
+            return Response('Request failed', status=status.HTTP_400_BAD_REQUEST)
+
+
+  
