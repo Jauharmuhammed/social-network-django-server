@@ -36,22 +36,22 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
     def create(self, validated_data):
-        email=validated_data['email'],
-        username = email[0].split('@')[0]
+        email=validated_data['email']
+        username = email.split('@')[0]
 
         try:
 
             user = CustomUser.objects.create(
-                email=validated_data['email'],
+                email=validated_data['email'].lower(),
                 username=username,
             )
         except:
             random = str(datetime.datetime.now().microsecond)[:4]
-            username = str(email[0].split('@')[0]) + random
+            username = str(email.split('@')[0]) + random
             print(username)
 
             user = CustomUser.objects.create(
-                email=validated_data['email'],
+                email=validated_data['email'].lower(),
                 username=username,
             )
 

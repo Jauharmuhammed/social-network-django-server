@@ -8,17 +8,14 @@ class CustomUserManager(BaseUserManager):
         if not email:
             raise ValueError('Users must have an email address')
 
-
         user = self.model(
-            email=self.normalize_email(email),
+            email=(self.normalize_email(email)).lower(),
             username = username,
             mobile_number = mobile_number,
         )
 
         user.set_password(password)
         user.save(using=self._db)
-        user.is_active = True
-        print(user)
         user.save()
 
         return user
@@ -63,3 +60,14 @@ class CustomUser(AbstractBaseUser):
 
     def has_module_perms(self, app_label):
         return True
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    profile_picture = models.ImageField(blank=True, null=True, default='profile.jpg')
+    bio = models.TextField(null=True)
+    followers = models.ManyToManyField(CustomUser, related_name='following', blank=True)
+
+
+    def __str__(self):
+        return str(self.user.email)
