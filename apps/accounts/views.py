@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view, APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import MyTokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
+import jwt
 
 from rest_framework import generics
 from rest_framework import status
@@ -42,12 +43,28 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
 
 def get_tokens_for_user(user):
-    refresh = RefreshToken.for_user(user)
+    refreshToken = RefreshToken.for_user(user)
+    accessToken = refreshToken.access_token
 
-    return {
-        'refresh': str(refresh),
-        'access': str(refresh.access_token),
+    decodeAccess = jwt.decode(str(accessToken), config('SECRET_KEY'), algorithms=["HS256"]);
+    decodeRefresh = jwt.decode(str(refreshToken), config('SECRET_KEY'), algorithms=["HS256"]);
+
+    # add payload here!!
+    decodeAccess['username'] = user.username
+    decodeAccess['is_admin'] = user.is_superuser
+    decodeRefresh['username'] = user.username
+    decodeRefresh['is_admin'] = user.is_superuser
+
+    #encode
+    encodedAccess = jwt.encode(decodeAccess, config('SECRET_KEY'), algorithm="HS256")
+    encodedRefresh = jwt.encode(decodeRefresh, config('SECRET_KEY'), algorithm="HS256")
+
+    token = {
+        'refresh': str(encodedRefresh),
+        'access': str(encodedAccess),
     }
+    
+    return token 
 
 class RegisterView(APIView):
     def post(self, request):
