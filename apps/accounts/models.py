@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
+import os
+from urllib import request
+from django.core.files import File
 
 # Create your models here.
 class CustomUserManager(BaseUserManager):
@@ -64,10 +67,23 @@ class CustomUser(AbstractBaseUser):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    profile_picture = models.ImageField(blank=True, null=True, upload_to='profile_picture', default='profile_picture/profile.png')
+    profile_picture = models.ImageField(blank=True, null=True, upload_to='profile_picture') #  , default='profile_picture/profile.png'
+    profile_picture_url = models.URLField(blank=True, null=True,)
     bio = models.TextField(null=True)
     followers = models.ManyToManyField(CustomUser, related_name='following', blank=True)
 
 
     def __str__(self):
         return str(self.user.email)
+
+    def get_remote_image(self):
+        if self.profile_picture_url and not self.profile_picture:
+            result = request.urlretrieve(self.profile_picture_url[0])
+            self.profile_picture.save(
+                    os.path.basename(f'{self.profile_picture_url[0]}.jpg'),
+                    File(open(result[0], 'rb'))
+                    )
+    
+    def save(self, *args, **kwargs):
+        self.get_remote_image()
+        super().save(*args, **kwargs) 

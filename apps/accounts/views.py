@@ -7,7 +7,7 @@ import jwt
 
 from rest_framework import generics
 from rest_framework import status
-from apps.accounts.models import CustomUser
+from apps.accounts.models import CustomUser, UserProfile
 from .serializers import UserSerializer, RegisterSerializer
 
 import datetime
@@ -39,10 +39,12 @@ def getRoutes(request):
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
+    print('class called')
     serializer_class = MyTokenObtainPairSerializer
 
 
 def get_tokens_for_user(user):
+    print('called')
     refreshToken = RefreshToken.for_user(user)
     accessToken = refreshToken.access_token
 
@@ -137,6 +139,11 @@ class GoogleAuthApiView(APIView):
             user.save()
             user.is_active = True
             user.save()
+
+            user_profile = UserProfile.objects.get(user=user)
+            user_profile.profile_picture_url = googleUser['picture'],
+            user_profile.save()
+
 
         token = get_tokens_for_user(user)
         
