@@ -64,7 +64,7 @@ class CustomUser(AbstractBaseUser):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    profile_picture = models.ImageField(blank=True, null=True, default='profile.jpg')
+    profile_picture = models.ImageField(blank=True, null=True, upload_to='profile_picture', default='profile_picture/profile.png')
     bio = models.TextField(null=True)
     followers = models.ManyToManyField(CustomUser, related_name='following', blank=True)
 
