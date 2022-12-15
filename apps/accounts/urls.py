@@ -17,5 +17,7 @@ urlpatterns = [
 
     path('send-otp/', views.SendOtpView.as_view(), name='send_otp'),
     path('login-with-otp/', views.LoginWithOtpView.as_view(), name='login_with_otp'),
-    
+
+    path('<str:username>/', views.profile, name='profile'),
+    path('<str:username>/follow/', views.follow, name='follow'),
 ]

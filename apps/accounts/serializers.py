@@ -1,6 +1,6 @@
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
-from apps.accounts.models import CustomUser
+from apps.accounts.models import CustomUser, UserProfile
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password
 import datetime
@@ -22,6 +22,10 @@ class UserSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ['id', 'email', 'username', 'mobile_number', 'first_name', 'last_name', 'date_joined', 'is_superuser', 'is_active']
 
+    def get_profile(self, obj):
+            profile = obj.userprofile
+            serializer = UserProfileSerializer(profile, many=False)
+            return serializer.data
 
 class RegisterSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
@@ -61,3 +65,22 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.save()
 
         return user
+
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    profile_pic = serializers.SerializerMethodField(read_only=True)
+    followers_count = serializers.IntegerField(source='get_followers_count')
+    followings_count = serializers.IntegerField(source='get_followings_count')
+    full_name = serializers.CharField(source='get_full_name')
+    class Meta:
+        model = UserProfile
+        exclude = ['profile_picture', 'profile_picture_url']
+
+    def get_profile_pic(self, obj):
+        try:
+            pic = obj.profile_picture.url
+        except:
+            pic = '/media/profile_picture/profile.png'
+        return pic
+

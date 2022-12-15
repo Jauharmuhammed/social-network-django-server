@@ -1,5 +1,6 @@
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, APIView
+from rest_framework.decorators import api_view, APIView, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import MyTokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -8,7 +9,7 @@ import jwt
 from rest_framework import generics
 from rest_framework import status
 from apps.accounts.models import CustomUser, UserProfile
-from .serializers import UserSerializer, RegisterSerializer
+from .serializers import UserSerializer, RegisterSerializer, UserProfileSerializer
 
 import datetime
 from decouple import config
@@ -296,3 +297,49 @@ class LoginWithOtpView(APIView):
             return Response('OTP is incorrect', status=status.HTTP_400_BAD_REQUEST)
 
   
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def profile(request, username):
+    user_profile = UserProfile.objects.get(username=username)
+    user = CustomUser.objects.get(username=username)
+
+    if request.user in user_profile.followers.all():
+        is_following = True
+    else:
+        is_following = False
+
+    is_following = True  if request.user in user_profile.followers.all() else False
+    is_current_user = True  if request.user == user else False
+
+
+    serializer = UserProfileSerializer(user_profile, many=False)
+    data = dict(serializer.data)
+    data.update({'is_following':is_following, 'is_current_user': is_current_user})
+    return Response(data )
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def follow(request, username):
+    user = request.user
+    try:
+        user_to_follow = UserProfile.objects.get(username=username)
+        
+        if user == user_to_follow.user:
+            print('true')
+            return Response("You can't follow yourself")
+
+        if user in user_to_follow.followers.all():
+            user_to_follow.followers.remove(user)
+            user_to_follow.save()
+            return Response('User unfollowed')
+        
+        else:
+            user_to_follow.followers.add(user)
+            user_to_follow.save()
+            return Response('User followed')
+            
+    except Exception as e:
+        message = {'detail':f'{e}'}
+        return Response(message,status=status.HTTP_204_NO_CONTENT)

@@ -58,6 +58,9 @@ class CustomUser(AbstractBaseUser):
     def __str__(self):
         return self.email
 
+    def full_name(self):
+        return f'{self.first_name} {self.last_name}'
+
     def has_perm(self, perm, obj=None):
         return True
 
@@ -67,6 +70,9 @@ class CustomUser(AbstractBaseUser):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    username = models.CharField(max_length=50, unique=True)
+    first_name = models.CharField(max_length=50, blank=True)
+    last_name = models.CharField(max_length=50, blank=True)
     profile_picture = models.ImageField(blank=True, null=True, upload_to='profile_picture') #  , default='profile_picture/profile.png'
     profile_picture_url = models.URLField(blank=True, null=True,)
     bio = models.TextField(null=True)
@@ -75,6 +81,17 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return str(self.user.email)
+
+    def get_full_name(self):
+        if self.first_name or self.last_name:
+            return str(f'{self.first_name} {self.last_name}')
+        else: return self.username
+
+    def get_followers_count(self):
+        return self.followers.all().count()
+
+    def get_followings_count(self):
+        return self.user.following.all().count()
 
     def get_remote_image(self):
         if self.profile_picture_url and not self.profile_picture:
