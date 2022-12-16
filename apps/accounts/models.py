@@ -73,7 +73,7 @@ class UserProfile(models.Model):
     username = models.CharField(max_length=50, unique=True)
     first_name = models.CharField(max_length=50, blank=True)
     last_name = models.CharField(max_length=50, blank=True)
-    profile_picture = models.ImageField(blank=True, null=True, upload_to='profile_picture') #  , default='profile_picture/profile.png'
+    profile_picture = models.ImageField(blank=True, null=True, upload_to='social_network/profile_picture') #  , default='profile_picture/profile.png'
     profile_picture_url = models.URLField(blank=True, null=True,)
     bio = models.TextField(null=True)
     followers = models.ManyToManyField(CustomUser, related_name='following', blank=True)

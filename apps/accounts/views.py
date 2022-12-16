@@ -301,22 +301,27 @@ class LoginWithOtpView(APIView):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def profile(request, username):
-    user_profile = UserProfile.objects.get(username=username)
-    user = CustomUser.objects.get(username=username)
+    try:
+        user_profile = UserProfile.objects.get(username=username)
+        user = CustomUser.objects.get(username=username)
 
-    if request.user in user_profile.followers.all():
-        is_following = True
-    else:
-        is_following = False
+        if request.user in user_profile.followers.all():
+            is_following = True
+        else:
+            is_following = False
 
-    is_following = True  if request.user in user_profile.followers.all() else False
-    is_current_user = True  if request.user == user else False
+        is_following = True  if request.user in user_profile.followers.all() else False
+        is_current_user = True  if request.user == user else False
 
 
-    serializer = UserProfileSerializer(user_profile, many=False)
-    data = dict(serializer.data)
-    data.update({'is_following':is_following, 'is_current_user': is_current_user})
-    return Response(data )
+        serializer = UserProfileSerializer(user_profile, many=False)
+        data = dict(serializer.data)
+        data.update({'is_following':is_following, 'is_current_user': is_current_user})
+        return Response(data )
+        
+    except Exception as e:
+        message = {'detail':f'{e}'}
+        return Response(message,status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(['POST'])

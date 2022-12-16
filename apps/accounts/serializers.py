@@ -81,6 +81,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
         try:
             pic = obj.profile_picture.url
         except:
-            pic = '/media/profile_picture/profile.png'
+            pic = 'https://res.cloudinary.com/dpofqivee/image/upload/v1671189991/social_network/profile_picture/profile5_g2mamr.jpg'
         return pic
 

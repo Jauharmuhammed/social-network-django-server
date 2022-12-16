@@ -43,10 +43,13 @@ INSTALLED_APPS = [
 
     'apps.accounts.apps.AccountsConfig',
     'apps.administrator.apps.AdministratorConfig',
+    'apps.posts.apps.PostsConfig',
 
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
+    'cloudinary_storage',
+    'cloudinary',
 ]
 
 REST_FRAMEWORK = {
@@ -176,9 +179,10 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-# media files (Images Uploaded, Posts, Profile pictures)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR/'media'
+# !media storage location changed to cloudinary
+# media files (Images Uploaded, Posts, Profile pictures) 
+# MEDIA_URL = '/media/'
+# MEDIA_ROOT = BASE_DIR/'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -205,3 +209,13 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = True
 ACCOUNT_EMAIL_VERIFICATION = 'none'
+
+
+# cloudinary storage for media files (Images Uploaded, Posts, Profile pictures)
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': config('CLOUD_NAME'),
+    'API_KEY': config('API_KEY'),
+    'API_SECRET': config('API_SECRET'),
+}
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
