@@ -82,6 +82,19 @@ class UserProfile(models.Model):
     def __str__(self):
         return str(self.user.email)
 
+    def get_profile_pic(self):
+        try:
+            pic = self.profile_picture.url
+        except:
+            pic = 'https://res.cloudinary.com/dpofqivee/image/upload/v1671189991/social_network/profile_picture/profile5_g2mamr.jpg'
+        return pic
+
+    def get_following(self):
+        following = []
+        for i in self.user.following.all():
+            following.append(i.id)
+        return following
+
     def get_full_name(self):
         if self.first_name or self.last_name:
             return str(f'{self.first_name} {self.last_name}')

@@ -13,6 +13,9 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         # Add custom claims
         token['username'] = user.username
         token['is_admin'] = user.is_superuser
+        token['profile_pic'] = user.userprofile.get_profile_pic()
+        token['followers'] = user.userprofile.get_followers_count()
+        token['name'] = user.userprofile.get_full_name()
 
         return token
 
@@ -73,6 +76,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     followers_count = serializers.IntegerField(source='get_followers_count')
     followings_count = serializers.IntegerField(source='get_followings_count')
     full_name = serializers.CharField(source='get_full_name')
+    following = serializers.ListField(source='get_following')
     class Meta:
         model = UserProfile
         exclude = ['profile_picture', 'profile_picture_url']

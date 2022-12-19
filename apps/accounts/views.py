@@ -40,7 +40,6 @@ def getRoutes(request):
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
-    print('class called')
     serializer_class = MyTokenObtainPairSerializer
 
 
@@ -55,8 +54,16 @@ def get_tokens_for_user(user):
     # add payload here!!
     decodeAccess['username'] = user.username
     decodeAccess['is_admin'] = user.is_superuser
+    decodeAccess['profile_pic'] = user.userprofile.get_profile_pic()
+    decodeAccess['followers'] = user.userprofile.get_followers_count()
+    decodeAccess['name'] = user.userprofile.get_full_name()
+
+    
     decodeRefresh['username'] = user.username
     decodeRefresh['is_admin'] = user.is_superuser
+    decodeRefresh['profile_pic'] = user.userprofile.get_profile_pic()
+    decodeRefresh['followers'] = user.userprofile.get_followers_count()
+    decodeRefresh['name'] = user.userprofile.get_full_name()
 
     #encode
     encodedAccess = jwt.encode(decodeAccess, config('SECRET_KEY'), algorithm="HS256")
@@ -313,9 +320,14 @@ def profile(request, username):
         is_following = True  if request.user in user_profile.followers.all() else False
         is_current_user = True  if request.user == user else False
 
+        
+
 
         serializer = UserProfileSerializer(user_profile, many=False)
         data = dict(serializer.data)
+
+        # # follwing list
+        # following = user.following.all()
         data.update({'is_following':is_following, 'is_current_user': is_current_user})
         return Response(data )
         
@@ -348,3 +360,5 @@ def follow(request, username):
     except Exception as e:
         message = {'detail':f'{e}'}
         return Response(message,status=status.HTTP_204_NO_CONTENT)
+
+        
