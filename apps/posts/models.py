@@ -1,5 +1,5 @@
 from django.db import models
-from apps.accounts.models import CustomUser
+from apps.accounts.models import CustomUser, UserProfile
 import uuid
 
 class Tag(models.Model):
@@ -21,3 +21,7 @@ class Post(models.Model):
 
     def __str__(self):
             return self.title
+
+    def get_user_profile(self):
+        profile = UserProfile.objects.filter(username=self.user.username).first()
+        return profile
