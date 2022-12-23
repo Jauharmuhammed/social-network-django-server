@@ -25,3 +25,38 @@ class Post(models.Model):
     def get_user_profile(self):
         profile = UserProfile.objects.filter(username=self.user.username).first()
         return profile
+
+    # to get comment with parent is none and active is true
+    def get_comments(self):
+        return self.comments.filter(parent=None).filter(active=True)  
+
+    def get_comments_count(self):
+        return self.comments.filter(active=True).count()    
+
+class Comment(models.Model):
+    id = models.UUIDField(default=uuid.uuid4,  unique=True, primary_key=True, editable=False)
+    post=models.ForeignKey(Post,on_delete=models.CASCADE, related_name="comments")
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    parent=models.ForeignKey("self", related_name='replies', null=True, blank=True, on_delete=models.CASCADE)
+    body = models.TextField()
+    
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    active = models.BooleanField(default=True)
+    class Meta:
+        ordering = ('created',)
+    
+    def __str__(self):
+        return self.body
+
+    def get_user_name(self):
+        return self.user.userprofile.get_full_name()
+
+    def get_user_profile_pic(self):
+        return self.user.userprofile.get_profile_pic()
+
+    def get_replies(self):
+        return Comment.objects.filter(parent=self).filter(active=True)
+
+    def get_replies_count(self):
+        return Comment.objects.filter(parent=self).filter(active=True).count()

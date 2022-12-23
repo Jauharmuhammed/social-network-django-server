@@ -69,7 +69,7 @@ class CustomUser(AbstractBaseUser):
 
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    user = models.OneToOneField(CustomUser, related_name='userprofile', on_delete=models.CASCADE)
     username = models.CharField(max_length=50, unique=True)
     first_name = models.CharField(max_length=50, blank=True)
     last_name = models.CharField(max_length=50, blank=True)

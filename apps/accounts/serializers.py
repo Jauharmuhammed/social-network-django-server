@@ -73,8 +73,8 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class UserProfileSerializer(serializers.ModelSerializer):
     profile_pic = serializers.SerializerMethodField(read_only=True)
-    followers_count = serializers.IntegerField(source='get_followers_count')
-    followings_count = serializers.IntegerField(source='get_followings_count')
+    followers_count = serializers.CharField(source='get_followers_count')
+    followings_count = serializers.CharField(source='get_followings_count')
     full_name = serializers.CharField(source='get_full_name')
     following = serializers.ListField(source='get_following')
     class Meta:

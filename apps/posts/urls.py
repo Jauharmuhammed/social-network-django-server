@@ -5,11 +5,12 @@ from rest_framework.routers import DefaultRouter
 router = DefaultRouter()
 router.register(r'post', views.PostViewSet, basename='post')
 router.register(r'tag', views.TagViewSet, basename='tag')
+router.register(r'comment', views.CommentViewSet, basename='comment')
 
 urlpatterns = [
     path('create-post/', views.create_post, name='create_post'),
-    # path('create/', views.CreatePostView.as_view(), name='create_post'),
-    # path('<int:id>/', include(router.urls)),
+    path('post/<str:id>/comments/', views.get_comments_by_post, name='comments_by_post'),
+    path('comment/<str:id>/replies/', views.get_replies, name='replies'),
 ]
 
 urlpatterns += router.urls

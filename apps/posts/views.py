@@ -7,8 +7,8 @@ from rest_framework.response import Response
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.parsers import FormParser, MultiPartParser, FileUploadParser
 
-from .models import Post, Tag
-from .serializers import PostSerializer, TagSerializer
+from .models import Post, Tag, Comment
+from .serializers import PostSerializer, TagSerializer, CommentSerializer
 
 
 
@@ -34,7 +34,7 @@ def create_post(request):
         for tag in tags:
             tag_instance = Tag.objects.filter(name__iexact=tag).first()
             if not tag_instance:
-                tag_instance = Tag.objects.create(name=tag)
+                tag_instance = Tag.objects.create(name=tag.lower())
             post.tags.add(tag_instance)
     post.save()
 
@@ -57,3 +57,21 @@ class PostViewSet(viewsets.ModelViewSet):
 class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all().order_by('name')
     serializer_class = TagSerializer
+
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_comments_by_post(request, id):
+    comments = Comment.objects.filter(post=id, parent=None).order_by('-created')
+    serializer = CommentSerializer(comments, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_replies(request, id):
+    comments = Comment.objects.filter(parent=id).order_by('-created')
+    serializer = CommentSerializer(comments, many=True)
+    return Response(serializer.data)
