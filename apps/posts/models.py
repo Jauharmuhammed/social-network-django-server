@@ -50,7 +50,7 @@ class Comment(models.Model):
         return self.body
 
     def get_user_name(self):
-        return self.user.userprofile.get_full_name()
+        return self.user.username
 
     def get_user_profile_pic(self):
         return self.user.userprofile.get_profile_pic()

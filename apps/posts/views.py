@@ -72,6 +72,6 @@ def get_comments_by_post(request, id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_replies(request, id):
-    comments = Comment.objects.filter(parent=id).order_by('-created')
+    comments = Comment.objects.filter(parent=id).order_by('created')
     serializer = CommentSerializer(comments, many=True)
     return Response(serializer.data)

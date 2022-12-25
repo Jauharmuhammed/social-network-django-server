@@ -62,10 +62,14 @@ class CustomUser(AbstractBaseUser):
         return f'{self.first_name} {self.last_name}'
 
     def has_perm(self, perm, obj=None):
-        return True
+        return self.is_superuser
 
     def has_module_perms(self, app_label):
-        return True
+        return self.is_superuser
+
+    def get_all_permissions(user=None):
+        if user.is_superuser:
+            return set()
 
 
 class UserProfile(models.Model):
