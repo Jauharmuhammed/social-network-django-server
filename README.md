@@ -37,7 +37,7 @@
 
 
 ## About The Project
-This is the backend api using Django Rest Framework for Pinterest like social network platform. You can find the frontend of the project [here](https://github.com/Jauharmuhammed/incubation-frontend-react)
+This is the backend api using Django Rest Framework for Pinterest like social network platform. You can find the frontend of the project [here](https://github.com/Jauharmuhammed/social-network-react-client)
 
 - User Authentication using JWT (JSON Web Token).
 - Google and Mobile authentication
