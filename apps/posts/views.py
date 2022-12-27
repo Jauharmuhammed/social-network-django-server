@@ -11,7 +11,6 @@ from .models import Post, Tag, Comment
 from .serializers import PostSerializer, TagSerializer, CommentSerializer
 
 
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_post(request):
@@ -19,6 +18,7 @@ def create_post(request):
     image = request.data['image']
     title = request.data['title']
     description = request.data['description']
+    location = request.data['location']
 
     tags = request.data['tags'].split(',')
 
@@ -28,6 +28,7 @@ def create_post(request):
         image=image,
         title=title,
         description=description,
+        location=location,
     )
 
     if tags is not None:
@@ -41,12 +42,46 @@ def create_post(request):
     serializer = PostSerializer(post, many=False)
     return Response(serializer.data)
 
-    # serializer = PostSerializer(data=request.data)
-    # if serializer.is_valid():
-    #     serializer.save()
-    #     return Response(serializer.data, status=status.HTTP_201_CREATED)
-    # else:
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def edit_post(request, id):
+    print(request.data)
+    title = request.data['title']
+    description = request.data['description']
+    location = request.data['location']
+
+    tags = request.data['tags'].split(',')
+
+    post = Post.objects.get(id=id)
+    post.title = title
+    post.description = description
+    post.location = location
+
+    print(post.tags.all())
+
+    for tag in list(post.tags.all()):
+            print(tag)
+            if tag not in tags:
+                print(tag)
+                print(tags)
+
+                post.tags.remove(tag)
+
+    if tags is not None:
+        for tag in tags:
+            if tag not in list(post.tags.all()):
+                tag_instance = Tag.objects.filter(name__iexact=tag).first()
+                if not tag_instance:
+                    tag_instance = Tag.objects.create(name=tag.lower())
+                post.tags.add(tag_instance)
+        
+    post.save()
+
+    post.save()
+
+    serializer = PostSerializer(post, many=False)
+    return Response(serializer.data)
 
 
 
@@ -62,6 +97,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_comments_by_post(request, id):
@@ -75,3 +111,37 @@ def get_replies(request, id):
     comments = Comment.objects.filter(parent=id).order_by('created')
     serializer = CommentSerializer(comments, many=True)
     return Response(serializer.data)
+
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def posts_by_tag(request, tag_name):
+    tag = Tag.objects.get(name=tag_name)
+    posts = tag.posts.all()
+    serializer = PostSerializer(posts, many=True)
+    return Response(serializer.data)
+
+
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def like_comment(request, id):
+    user = request.user
+    try:
+        comment_to_like = Comment.objects.get(id=id)
+        print(comment_to_like)
+        if user in comment_to_like.like.all():
+            comment_to_like.like.remove(user)
+            comment_to_like.save()
+            return Response('Comment liked')
+        
+        else:
+            comment_to_like.like.add(user)
+            comment_to_like.save()
+            return Response('Comment disliked')
+            
+    except Exception as e:
+        message = {'detail':f'{e}'}
+        return Response(message,status=status.HTTP_204_NO_CONTENT)

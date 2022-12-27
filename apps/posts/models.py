@@ -16,6 +16,7 @@ class Post(models.Model):
     description = models.TextField(null=True, blank=True)
     image = models.ImageField(upload_to='social_network/posts')
     tags = models.ManyToManyField(Tag, related_name='posts', blank=True)
+    location = models.CharField(max_length=255, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -39,6 +40,8 @@ class Comment(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     parent=models.ForeignKey("self", related_name='replies', null=True, blank=True, on_delete=models.CASCADE)
     body = models.TextField()
+
+    like = models.ManyToManyField(UserProfile, blank=True)
     
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -60,3 +63,6 @@ class Comment(models.Model):
 
     def get_replies_count(self):
         return Comment.objects.filter(parent=self).filter(active=True).count()
+
+    def get_likes_count(self):
+        return self.like.all().count()
