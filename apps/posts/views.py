@@ -33,6 +33,8 @@ def create_post(request):
 
     if tags is not None:
         for tag in tags:
+            if tag.strip() == '': continue
+
             tag_instance = Tag.objects.filter(name__iexact=tag).first()
             if not tag_instance:
                 tag_instance = Tag.objects.create(name=tag.lower())
@@ -70,12 +72,13 @@ def edit_post(request, id):
 
     if tags is not None:
         for tag in tags:
+            if tag.strip() == '': continue
             if tag not in list(post.tags.all()):
                 tag_instance = Tag.objects.filter(name__iexact=tag).first()
                 if not tag_instance:
                     tag_instance = Tag.objects.create(name=tag.lower())
                 post.tags.add(tag_instance)
-        
+    
     post.save()
 
     post.save()
