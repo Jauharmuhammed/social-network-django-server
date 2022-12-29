@@ -41,7 +41,7 @@ class Comment(models.Model):
     parent=models.ForeignKey("self", related_name='replies', null=True, blank=True, on_delete=models.CASCADE)
     body = models.TextField()
 
-    like = models.ManyToManyField(UserProfile, blank=True)
+    like = models.ManyToManyField(CustomUser, related_name='liked_comments', blank=True)
     
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)

@@ -138,12 +138,12 @@ def like_comment(request, id):
         if user in comment_to_like.like.all():
             comment_to_like.like.remove(user)
             comment_to_like.save()
-            return Response('Comment liked')
+            return Response('Comment disliked')
         
         else:
             comment_to_like.like.add(user)
             comment_to_like.save()
-            return Response('Comment disliked')
+            return Response('Comment liked')
             
     except Exception as e:
         message = {'detail':f'{e}'}
