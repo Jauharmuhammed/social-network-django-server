@@ -34,7 +34,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
             required=True,
             validators=[UniqueValidator(queryset=CustomUser.objects.all())]
-            )
+    )
 
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
 
@@ -85,6 +85,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
         try:
             pic = obj.profile_picture.url
         except:
-            pic = 'https://res.cloudinary.com/dpofqivee/image/upload/v1671189991/social_network/profile_picture/profile5_g2mamr.jpg'
+            pic = 'https://res.cloudinary.com/dpofqivee/image/upload/v1672380610/social_network/profile_picture/profile_nloi7m.jpg'
         return pic
 

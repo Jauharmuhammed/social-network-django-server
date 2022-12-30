@@ -77,8 +77,8 @@ class UserProfile(models.Model):
     username = models.CharField(max_length=50, unique=True)
     first_name = models.CharField(max_length=50, blank=True)
     last_name = models.CharField(max_length=50, blank=True)
-    profile_picture = models.ImageField(blank=True, null=True, upload_to='social_network/profile_picture') #  , default='profile_picture/profile.png'
-    profile_picture_url = models.URLField(blank=True, null=True,)
+    profile_picture = models.ImageField(blank=True, null=True, upload_to='social_network/profile_picture', max_length=255) #  , default='profile_picture/profile.png'
+    profile_picture_url = models.URLField(blank=True, null=True, max_length=255)
     bio = models.TextField(null=True)
     followers = models.ManyToManyField(CustomUser, related_name='following', blank=True)
 
@@ -90,7 +90,7 @@ class UserProfile(models.Model):
         try:
             pic = self.profile_picture.url
         except:
-            pic = 'https://res.cloudinary.com/dpofqivee/image/upload/v1671189991/social_network/profile_picture/profile5_g2mamr.jpg'
+            pic = 'https://res.cloudinary.com/dpofqivee/image/upload/v1672380610/social_network/profile_picture/profile_nloi7m.jpg'
         return pic
 
     def get_following(self):

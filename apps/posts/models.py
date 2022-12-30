@@ -14,7 +14,7 @@ class Post(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
-    image = models.ImageField(upload_to='social_network/posts')
+    image = models.ImageField(upload_to='social_network/posts', max_length=255)
     tags = models.ManyToManyField(Tag, related_name='posts', blank=True)
     location = models.CharField(max_length=255, null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
