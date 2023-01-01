@@ -76,6 +76,8 @@ class Collection(models.Model):
     posts = models.ManyToManyField(Post, blank=True)
     cover = models.ImageField(upload_to='social_network/collections', null=True, blank=True, max_length=255)
 
+    collaborators = models.ManyToManyField(CustomUser)
+
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     active = models.BooleanField(default=True)
