@@ -23,6 +23,6 @@ class TagAdmin(admin.ModelAdmin):
 
 @admin.register(Collection)
 class CollectionAdmin(admin.ModelAdmin):
-    list_display=('name', 'user', 'created', 'private', 'active')
+    list_display=('name', 'slug', 'user', 'created', 'private', 'active')
     list_filter = ('active', 'created', 'updated' , 'private')
     search_fields = ('name', 'user')

@@ -2,13 +2,11 @@ from django.shortcuts import render
 
 from rest_framework import viewsets, status, generics
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.decorators import api_view, permission_classes, authentication_classes, APIView, parser_classes
+from rest_framework.decorators import api_view, permission_classes, authentication_classes, APIView
 from rest_framework.response import Response
-from rest_framework.authentication import BasicAuthentication
-from rest_framework.parsers import FormParser, MultiPartParser, FileUploadParser
 
-from .models import Post, Tag, Comment
-from .serializers import PostSerializer, TagSerializer, CommentSerializer
+from .models import Post, Tag, Comment, Collection
+from .serializers import PostSerializer, TagSerializer, CommentSerializer, CollectionSerializer
 from apps.accounts.models import CustomUser
 
 
@@ -23,7 +21,6 @@ def create_post(request):
 
     tags = request.data['tags'].split(',')
 
-
     post = Post.objects.create(
         user=user,
         image=image,
@@ -34,7 +31,8 @@ def create_post(request):
 
     if tags is not None:
         for tag in tags:
-            if tag.strip() == '': continue
+            if tag.strip() == '':
+                continue
 
             tag_instance = Tag.objects.filter(name__iexact=tag).first()
             if not tag_instance:
@@ -64,22 +62,23 @@ def edit_post(request, id):
     print(post.tags.all())
 
     for tag in list(post.tags.all()):
+        print(tag)
+        if tag not in tags:
             print(tag)
-            if tag not in tags:
-                print(tag)
-                print(tags)
+            print(tags)
 
-                post.tags.remove(tag)
+            post.tags.remove(tag)
 
     if tags is not None:
         for tag in tags:
-            if tag.strip() == '': continue
+            if tag.strip() == '':
+                continue
             if tag not in list(post.tags.all()):
                 tag_instance = Tag.objects.filter(name__iexact=tag).first()
                 if not tag_instance:
                     tag_instance = Tag.objects.create(name=tag.lower())
                 post.tags.add(tag_instance)
-    
+
     post.save()
 
     post.save()
@@ -88,14 +87,15 @@ def edit_post(request, id):
     return Response(serializer.data)
 
 
-
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all().order_by('-created')
     serializer_class = PostSerializer
 
+
 class TagViewSet(viewsets.ModelViewSet):
     queryset = Tag.objects.all().order_by('name')
     serializer_class = TagSerializer
+
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
@@ -105,9 +105,11 @@ class CommentViewSet(viewsets.ModelViewSet):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_comments_by_post(request, id):
-    comments = Comment.objects.filter(post=id, parent=None).order_by('-created')
+    comments = Comment.objects.filter(
+        post=id, parent=None).order_by('-created')
     serializer = CommentSerializer(comments, many=True)
     return Response(serializer.data)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -117,7 +119,6 @@ def get_replies(request, id):
     return Response(serializer.data)
 
 
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def posts_by_tag(request, tag_name):
@@ -125,8 +126,6 @@ def posts_by_tag(request, tag_name):
     posts = tag.posts.all()
     serializer = PostSerializer(posts, many=True)
     return Response(serializer.data)
-
-
 
 
 @api_view(['POST'])
@@ -140,16 +139,15 @@ def like_comment(request, id):
             comment_to_like.like.remove(user)
             comment_to_like.save()
             return Response('Comment disliked')
-        
+
         else:
             comment_to_like.like.add(user)
             comment_to_like.save()
             return Response('Comment liked')
-            
-    except Exception as e:
-        message = {'detail':f'{e}'}
-        return Response(message,status=status.HTTP_204_NO_CONTENT)
 
+    except Exception as e:
+        message = {'detail': f'{e}'}
+        return Response(message, status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(['GET'])
@@ -159,3 +157,81 @@ def posts_by_user(request, username):
     posts = Post.objects.filter(user=user)
     serializer = PostSerializer(posts, many=True)
     return Response(serializer.data)
+
+
+class CollectionViewSet(viewsets.ModelViewSet):
+    queryset = Collection.objects.all().order_by('-updated')
+    serializer_class = CollectionSerializer
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def collections_by_user(request, username):
+    user = CustomUser.objects.get(username=username)
+
+    if user == request.user:
+        collection = Collection.objects.filter(user=user).order_by('-updated')
+
+    else:
+        collection = Collection.objects.filter(user=user, private=False).order_by('-updated')
+
+    serializer = CollectionSerializer(collection, many=True)
+    return Response(serializer.data)
+
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def posts_by_collection(request, username, slug):
+    user = CustomUser.objects.get(username=username)
+
+    if user == request.user:
+        collection = Collection.objects.filter(user=user, slug=slug).first()
+    else:
+        collection = Collection.objects.filter(user=user, slug=slug, private=False).first()
+
+    posts = Post.objects.filter(id__in=collection.posts.all())
+    serializer = PostSerializer(posts, many=True)
+    collection_serializer = CollectionSerializer(collection, many=False)
+    return Response({ 'collection': collection_serializer.data, 'posts': serializer.data})
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def save_to_collection(request, collection_slug, post_id):
+    try:
+        collection = Collection.objects.filter(slug=collection_slug, user=request.user).first()
+    
+
+        if collection is not None:
+            post = Post.objects.get(id=post_id)
+            if post not in collection.posts.all():
+                collection.posts.add(post)
+            else:
+                return Response('Post already in the collection')
+
+        return Response('Post saved successfully')
+
+    except Exception as e:
+        return Response(e)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def remove_from_collection(request, collection_slug, post_id):
+    try:
+        collection = Collection.objects.filter(slug=collection_slug, user=request.user).first()
+    
+
+        if collection is not None:
+            post = Post.objects.get(id=post_id)
+            if post in collection.posts.all():
+                collection.posts.remove(post)
+            else:
+                return Response('Post is not in the collection')
+
+        return Response('Post removed successfully')
+
+    except Exception as e:
+        return Response(e)
+

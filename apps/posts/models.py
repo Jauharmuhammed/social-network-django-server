@@ -1,6 +1,7 @@
 from django.db import models
 from apps.accounts.models import CustomUser, UserProfile
 import uuid
+from autoslug import AutoSlugField
 
 class Tag(models.Model):
     name = models.CharField(primary_key=True, max_length=150, null=False, blank=False)
@@ -69,12 +70,19 @@ class Comment(models.Model):
 
 
 class Collection(models.Model):
-    id = models.UUIDField(default=uuid.uuid4,  unique=True, primary_key=True, editable=False)
     name = models.CharField(max_length=150)
+    slug = AutoSlugField(populate_from='name', max_length=100,)
     user = models.ForeignKey(CustomUser, related_name='collections', on_delete=models.CASCADE)
-    post = models.ManyToManyField(Post, blank=True)
+    posts = models.ManyToManyField(Post, blank=True)
+    cover = models.ImageField(upload_to='social_network/collections', null=True, blank=True, max_length=255)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     active = models.BooleanField(default=True)
     private = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.name
+
+    def get_user_profile_pic(self):
+        return self.user.userprofile.get_profile_pic()

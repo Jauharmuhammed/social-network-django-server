@@ -27,6 +27,8 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class CollectionSerializer(serializers.ModelSerializer):
+    profile_pic = serializers.URLField(source='get_user_profile_pic', read_only=True)
+
     class Meta:
         model = Collection
         fields = '__all__'
