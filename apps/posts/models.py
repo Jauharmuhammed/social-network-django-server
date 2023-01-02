@@ -37,7 +37,7 @@ class Post(models.Model):
 class Comment(models.Model):
     id = models.UUIDField(default=uuid.uuid4,  unique=True, primary_key=True, editable=False)
     post=models.ForeignKey(Post,on_delete=models.CASCADE, related_name="comments")
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, related_name='posts',  on_delete=models.CASCADE)
     parent=models.ForeignKey("self", related_name='replies', null=True, blank=True, on_delete=models.CASCADE)
     body = models.TextField()
 
@@ -66,3 +66,15 @@ class Comment(models.Model):
 
     def get_likes_count(self):
         return self.like.all().count()
+
+
+class Collection(models.Model):
+    id = models.UUIDField(default=uuid.uuid4,  unique=True, primary_key=True, editable=False)
+    name = models.CharField(max_length=150)
+    user = models.ForeignKey(CustomUser, related_name='collections', on_delete=models.CASCADE)
+    post = models.ManyToManyField(Post, blank=True)
+
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+    active = models.BooleanField(default=True)
+    private = models.BooleanField(default=False)

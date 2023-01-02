@@ -1,4 +1,4 @@
-from .models import Post, Tag, Comment
+from .models import Post, Tag, Comment, Collection
 from rest_framework import serializers
 from apps.accounts.serializers import UserProfileSerializer
 
@@ -23,4 +23,10 @@ class CommentSerializer(serializers.ModelSerializer):
     likes_count = serializers.CharField(source='get_likes_count', read_only=True)
     class Meta:
         model = Comment
+        fields = '__all__'
+
+
+class CollectionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Collection
         fields = '__all__'

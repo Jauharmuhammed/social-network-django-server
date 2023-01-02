@@ -9,6 +9,7 @@ from rest_framework.parsers import FormParser, MultiPartParser, FileUploadParser
 
 from .models import Post, Tag, Comment
 from .serializers import PostSerializer, TagSerializer, CommentSerializer
+from apps.accounts.models import CustomUser
 
 
 @api_view(['POST'])
@@ -148,3 +149,13 @@ def like_comment(request, id):
     except Exception as e:
         message = {'detail':f'{e}'}
         return Response(message,status=status.HTTP_204_NO_CONTENT)
+
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def posts_by_user(request, username):
+    user = CustomUser.objects.get(username=username)
+    posts = Post.objects.filter(user=user)
+    serializer = PostSerializer(posts, many=True)
+    return Response(serializer.data)
