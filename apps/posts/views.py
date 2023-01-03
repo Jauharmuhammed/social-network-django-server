@@ -208,9 +208,10 @@ def save_to_collection(request, collection_slug, post_id):
             if post not in collection.posts.all():
                 collection.posts.add(post)
             else:
-                return Response('Post already in the collection')
+                return Response('Post already in the collection', status=status.HTTP_204_NO_CONTENT)
 
-        return Response('Post saved successfully')
+        serializer = CollectionSerializer(collection, many=False)
+        return Response(serializer.data)
 
     except Exception as e:
         return Response(e)
@@ -230,7 +231,8 @@ def remove_from_collection(request, collection_slug, post_id):
             else:
                 return Response('Post is not in the collection')
 
-        return Response('Post removed successfully')
+        serializer = CollectionSerializer(collection, many=False)
+        return Response(serializer.data)
 
     except Exception as e:
         return Response(e)
