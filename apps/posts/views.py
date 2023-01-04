@@ -9,6 +9,8 @@ from .models import Post, Tag, Comment, Collection
 from .serializers import PostSerializer, TagSerializer, CommentSerializer, CollectionSerializer
 from apps.accounts.models import CustomUser
 
+from django.db.models.functions import Now
+from django.db import IntegrityError
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -207,6 +209,8 @@ def save_to_collection(request, collection_slug, post_id):
             post = Post.objects.get(id=post_id)
             if post not in collection.posts.all():
                 collection.posts.add(post)
+                collection.updated= Now()
+                collection.save()
             else:
                 return Response('Post already in the collection', status=status.HTTP_204_NO_CONTENT)
 
@@ -237,3 +241,18 @@ def remove_from_collection(request, collection_slug, post_id):
     except Exception as e:
         return Response(e)
 
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_collection(request): 
+    try:
+        serializer = CollectionSerializer(data=request.data, many=False)
+
+        if serializer.is_valid():
+            serializer.save()
+
+        return Response(serializer.data)
+    except IntegrityError as e:
+        print(e)
+        return Response('A collection With the same name already exists', status=status.HTTP_400_BAD_REQUEST)
+            

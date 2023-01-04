@@ -81,6 +81,9 @@ class Collection(models.Model):
     active = models.BooleanField(default=True)
     private = models.BooleanField(default=False)
 
+    class Meta:
+      unique_together = 'user', 'slug'
+
     def __str__(self):
         return self.name
 
