@@ -46,6 +46,10 @@ INSTALLED_APPS = [
     'apps.accounts.apps.AccountsConfig',
     'apps.administrator.apps.AdministratorConfig',
     'apps.posts.apps.PostsConfig',
+    'apps.reports.apps.ReportsConfig',
+    'apps.collection.apps.CollectionConfig',
+    'apps.chats.apps.ChatsConfig',
+    'apps.notifications.apps.NotificationsConfig',
 
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
