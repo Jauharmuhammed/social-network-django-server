@@ -34,6 +34,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'jazzmin',
 
     'django.contrib.admin',
@@ -131,7 +132,10 @@ TEMPLATES = [
     },
 ]
 
+ASGI_APPLICATION = "config.asgi.application"
+
 WSGI_APPLICATION = 'config.wsgi.application'
+
 
 
 # Database
@@ -145,6 +149,13 @@ DATABASES = {
         'PASSWORD': config('DATABASES_PASSWORD'),
         'HOST': 'localhost',
         'PORT': '5432'
+    }
+}
+
+# channel layers
+CHANNEL_LAYERS = {
+    'default':{
+        'BACKEND':'channels.layers.InMemoryChannelLayer'
     }
 }
 
