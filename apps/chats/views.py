@@ -20,7 +20,7 @@ class ConversationViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
     def get_queryset(self):
         queryset = Conversation.objects.filter(
             name__contains=self.request.user.username
-        )
+        ).order_by()
         return queryset
 
     def get_serializer_context(self):
