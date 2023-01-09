@@ -21,9 +21,10 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    profile = serializers.SerializerMethodField()
     class Meta:
         model = CustomUser
-        fields = ['id', 'email', 'username', 'mobile_number', 'first_name', 'last_name', 'date_joined', 'is_superuser', 'is_active']
+        fields = ['id', 'email', 'username', 'mobile_number', 'first_name', 'last_name', 'date_joined', 'is_superuser', 'is_active', 'profile']
 
     def get_profile(self, obj):
             profile = obj.userprofile
