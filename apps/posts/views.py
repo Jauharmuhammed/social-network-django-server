@@ -12,6 +12,12 @@ from apps.accounts.models import CustomUser
 from django.db.models.functions import Now
 from django.db import IntegrityError
 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+
+from apps.notifications.models import Notification
+from apps.notifications.serializers import NotificationSerializer
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_post(request):
@@ -145,6 +151,26 @@ def like_comment(request, id):
         else:
             comment_to_like.like.add(user)
             comment_to_like.save()
+
+            if (request.user != comment_to_like.user):
+                # create a new notification
+                notification = Notification.objects.create(
+                    to_user = comment_to_like.user,
+                    created_by = request.user,
+                    content = 'liked your comment',
+                    notification_type = 'like',
+                    post = comment_to_like.post,
+                )
+
+                # send notification to the user
+                channel_layer = get_channel_layer()
+                async_to_sync(channel_layer.group_send)(
+                    f'{comment_to_like.user.username}__notifications',
+                    {
+                        'type': 'new_notification',
+                        'message': NotificationSerializer(notification).data
+                    }
+                )
             return Response('Comment liked')
 
     except Exception as e:
@@ -211,6 +237,26 @@ def save_to_collection(request, collection_slug, post_id):
                 collection.posts.add(post)
                 collection.updated= Now()
                 collection.save()
+
+                if (request.user != post.user):
+                    # create a new notification
+                    notification = Notification.objects.create(
+                        to_user = post.user,
+                        created_by = request.user,
+                        content = 'saved your post',
+                        notification_type = 'save',
+                        post = post,
+                    )
+
+                    # send notification to the user
+                    channel_layer = get_channel_layer()
+                    async_to_sync(channel_layer.group_send)(
+                        f'{post.user.username}__notifications',
+                        {
+                            'type': 'new_notification',
+                            'message': NotificationSerializer(notification).data
+                        }
+                    )
             else:
                 return Response('Post already in the collection', status=status.HTTP_204_NO_CONTENT)
 

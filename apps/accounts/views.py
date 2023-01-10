@@ -363,6 +363,10 @@ def follow(request, username):
             user_to_follow.followers.add(user)
             user_to_follow.save()
 
+            previous_follow = Notification.objects.filter(to_user = user_to_follow.user, notification_type = 'follow').first()
+            print(previous_follow)
+            if previous_follow:
+                previous_follow.delete()
 
             # create a new notification
             notification = Notification.objects.create(

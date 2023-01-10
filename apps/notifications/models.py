@@ -1,13 +1,14 @@
 from django.db import models
 import uuid
 from django.contrib.auth import get_user_model
+from apps.posts.models import Post
 
 User = get_user_model()
 
 # Create your models here.
 class Notification(models.Model):
     CHOICES = (
-        ('post', 'post'),
+        ('comment', 'comment'),
         ('save', 'save'),
         ('reply', 'reply'),
         ('like', 'like'),
@@ -20,6 +21,7 @@ class Notification(models.Model):
     created_by = models.ForeignKey(User,on_delete=models.CASCADE, null=True, blank=True)
     content = models.CharField(max_length=255)
     notification_type = models.CharField(max_length=20, choices=CHOICES)
+    post = models.ForeignKey(Post,on_delete=models.CASCADE, null=True, blank=True)
     followed_by = models.ForeignKey(User,on_delete=models.CASCADE, null=True, blank=True, related_name='followed_by')
     read = models.BooleanField(default=False)
     

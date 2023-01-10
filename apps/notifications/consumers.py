@@ -78,6 +78,7 @@ class NotificationsConsumer(JsonWebsocketConsumer):
 
 
     def new_notification(self,event):
+        print('Event Triggered')
         # Receive message from room group
         message = event['message']
         # Send message to WebSocket
