@@ -31,7 +31,8 @@ class MessageViewSet(ListModelMixin, GenericViewSet):
     serializer_class = MessageSerializer
     queryset = Message.objects.none()
     pagination_class = MessagePagination
-    permission_classes= [AllowAny]
+    permission_classes= [IsAuthenticated]
+
 
     def get_queryset(self):
         conversation_name = self.request.GET.get("conversation")

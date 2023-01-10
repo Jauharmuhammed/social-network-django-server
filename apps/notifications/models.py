@@ -1,3 +1,27 @@
 from django.db import models
+import uuid
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 # Create your models here.
+class Notification(models.Model):
+    CHOICES = (
+        ('post', 'post'),
+        ('save', 'save'),
+        ('reply', 'reply'),
+        ('like', 'like'),
+        ('follow', 'follow'),
+    )
+
+    id = models.UUIDField(default=uuid.uuid4,  unique=True, primary_key=True, editable=False)
+    to_user = models.ForeignKey(User,on_delete=models.CASCADE, null=True, blank=True, related_name='notifications')
+    created = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(User,on_delete=models.CASCADE, null=True, blank=True)
+    content = models.CharField(max_length=255)
+    notification_type = models.CharField(max_length=20, choices=CHOICES)
+    followed_by = models.ForeignKey(User,on_delete=models.CASCADE, null=True, blank=True, related_name='followed_by')
+    read = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return self.content

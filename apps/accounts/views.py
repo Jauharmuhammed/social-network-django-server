@@ -28,6 +28,11 @@ from twilio.base.exceptions import TwilioRestException
 from google.oauth2 import id_token
 from google.auth.transport.requests import Request as GoogleRequest
 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+
+from apps.notifications.models import Notification
+from apps.notifications.serializers import NotificationSerializer
 
 @api_view(['GET'])
 def getRoutes(request):
@@ -357,6 +362,26 @@ def follow(request, username):
         else:
             user_to_follow.followers.add(user)
             user_to_follow.save()
+
+
+            # create a new notification
+            notification = Notification.objects.create(
+                to_user = user_to_follow.user,
+                created_by = request.user,
+                content = 'Started Following You',
+                notification_type = 'follow',
+                followed_by = request.user,
+            )
+
+            # send notification to the user
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                f'{user_to_follow.username}__notifications',
+                {
+                    'type': 'new_notification',
+                    'message': NotificationSerializer(notification).data
+                }
+            )
             return Response('User followed')
             
     except Exception as e:
