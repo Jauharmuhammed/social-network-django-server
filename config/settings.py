@@ -66,6 +66,10 @@ REST_FRAMEWORK = {
 
 }
 
+WHITENOISE_MIMETYPES = {
+    '.xsl': 'application/xml'
+}
+
 
 # JWT token customization
 SIMPLE_JWT = {
