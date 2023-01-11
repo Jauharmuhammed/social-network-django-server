@@ -13,6 +13,8 @@ def create_comment(sender, instance, created, **kwargs):
     if created:
 
         if instance.parent:
+            if instance.user == instance.parent.user: return
+
             # create a new reply notification
             notification = Notification.objects.create(
                 to_user = instance.parent.user,
@@ -33,6 +35,8 @@ def create_comment(sender, instance, created, **kwargs):
             )
             print(instance.parent.user.username)
         else:
+            if instance.user == instance.post.user: return
+
             # create a new comment notification
             notification = Notification.objects.create(
                 to_user = instance.post.user,
