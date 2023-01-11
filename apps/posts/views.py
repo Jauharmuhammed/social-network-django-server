@@ -312,3 +312,4 @@ def create_collection(request):
     except IntegrityError as e:
         print(e)
         return Response('A collection With the same name already exists', status=status.HTTP_400_BAD_REQUEST)
+
