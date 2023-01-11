@@ -18,6 +18,7 @@ from channels.layers import get_channel_layer
 from apps.notifications.models import Notification
 from apps.notifications.serializers import NotificationSerializer
 
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_post(request):
@@ -155,11 +156,11 @@ def like_comment(request, id):
             if (request.user != comment_to_like.user):
                 # create a new notification
                 notification = Notification.objects.create(
-                    to_user = comment_to_like.user,
-                    created_by = request.user,
-                    content = 'liked your comment',
-                    notification_type = 'like',
-                    post = comment_to_like.post,
+                    to_user=comment_to_like.user,
+                    created_by=request.user,
+                    content='liked your comment',
+                    notification_type='like',
+                    post=comment_to_like.post,
                 )
 
                 # send notification to the user
@@ -201,11 +202,11 @@ def collections_by_user(request, username):
         collection = Collection.objects.filter(user=user).order_by('-updated')
 
     else:
-        collection = Collection.objects.filter(user=user, private=False).order_by('-updated')
+        collection = Collection.objects.filter(
+            user=user, private=False).order_by('-updated')
 
     serializer = CollectionSerializer(collection, many=True)
     return Response(serializer.data)
-
 
 
 @api_view(['GET'])
@@ -216,36 +217,37 @@ def posts_by_collection(request, username, slug):
     if user == request.user:
         collection = Collection.objects.filter(user=user, slug=slug).first()
     else:
-        collection = Collection.objects.filter(user=user, slug=slug, private=False).first()
+        collection = Collection.objects.filter(
+            user=user, slug=slug, private=False).first()
 
     posts = Post.objects.filter(id__in=collection.posts.all())
     serializer = PostSerializer(posts, many=True)
     collection_serializer = CollectionSerializer(collection, many=False)
-    return Response({ 'collection': collection_serializer.data, 'posts': serializer.data})
+    return Response({'collection': collection_serializer.data, 'posts': serializer.data})
 
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def save_to_collection(request, collection_slug, post_id):
     try:
-        collection = Collection.objects.filter(slug=collection_slug, user=request.user).first()
-    
+        collection = Collection.objects.filter(
+            slug=collection_slug, user=request.user).first()
 
         if collection is not None:
             post = Post.objects.get(id=post_id)
             if post not in collection.posts.all():
                 collection.posts.add(post)
-                collection.updated= Now()
+                collection.updated = Now()
                 collection.save()
 
                 if (request.user != post.user):
                     # create a new notification
                     notification = Notification.objects.create(
-                        to_user = post.user,
-                        created_by = request.user,
-                        content = 'saved your post',
-                        notification_type = 'save',
-                        post = post,
+                        to_user=post.user,
+                        created_by=request.user,
+                        content='saved your post',
+                        notification_type='save',
+                        post=post,
                     )
 
                     # send notification to the user
@@ -271,8 +273,8 @@ def save_to_collection(request, collection_slug, post_id):
 @permission_classes([IsAuthenticated])
 def remove_from_collection(request, collection_slug, post_id):
     try:
-        collection = Collection.objects.filter(slug=collection_slug, user=request.user).first()
-    
+        collection = Collection.objects.filter(
+            slug=collection_slug, user=request.user).first()
 
         if collection is not None:
             post = Post.objects.get(id=post_id)
@@ -290,15 +292,23 @@ def remove_from_collection(request, collection_slug, post_id):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def create_collection(request): 
+def create_collection(request):
+    print(request.data['cover'])
+    user = request.user
+    name = request.data['name'][0]
+    private = request.data['private'][0]
+    cover = request.data['cover']
     try:
-        serializer = CollectionSerializer(data=request.data, many=False)
+        collection = Collection.objects.create(
+            user=user,
+            name=name,
+            private=private,
+            cover=cover,
+        )
 
-        if serializer.is_valid():
-            serializer.save()
+        serializer = CollectionSerializer(collection)
 
         return Response(serializer.data)
     except IntegrityError as e:
         print(e)
         return Response('A collection With the same name already exists', status=status.HTTP_400_BAD_REQUEST)
-            
