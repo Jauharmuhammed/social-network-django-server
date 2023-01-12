@@ -31,7 +31,7 @@ from apps.chats.middleware import JwtAuthMiddlewareStack
 
 application = ProtocolTypeRouter(
     {
-        "http": get_asgi_application(),
+        "http": django_application,
         "websocket": AllowedHostsOriginValidator(JwtAuthMiddlewareStack(URLRouter(routing.websocket_urlpatterns))),
     }
 )
