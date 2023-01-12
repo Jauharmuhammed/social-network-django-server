@@ -3,6 +3,10 @@ from apps.accounts.models import CustomUser, UserProfile
 import uuid
 from autoslug import AutoSlugField
 
+from urllib import request
+from django.core.files import File
+import os
+
 class Tag(models.Model):
     name = models.CharField(primary_key=True, max_length=150, null=False, blank=False)
 
@@ -75,6 +79,7 @@ class Collection(models.Model):
     user = models.ForeignKey(CustomUser, related_name='collections', on_delete=models.CASCADE)
     posts = models.ManyToManyField(Post, blank=True)
     cover = models.ImageField(upload_to='social_network/collections', null=True, blank=True, max_length=255)
+    cover_url = models.URLField(blank=True, null=True, max_length=255)
 
     collaborators = models.ManyToManyField(CustomUser)
 
@@ -91,3 +96,15 @@ class Collection(models.Model):
 
     def get_user_profile_pic(self):
         return self.user.userprofile.get_profile_pic()
+
+    def get_remote_image(self):
+        if self.cover_url and not self.cover:
+            result = request.urlretrieve(self.cover_url[0])
+            self.cover.save(
+                    os.path.basename(f'{self.cover_url[0]}.jpg'),
+                    File(open(result[0], 'rb'))
+                    )
+    
+    def save(self, *args, **kwargs):
+        self.get_remote_image()
+        super().save(*args, **kwargs) 

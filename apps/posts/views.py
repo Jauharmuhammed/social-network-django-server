@@ -293,11 +293,13 @@ def remove_from_collection(request, collection_slug, post_id):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_collection(request):
-    print(request.data['cover'])
+    print(request.data['cover_url'])
     user = request.user
-    name = request.data['name'][0]
-    private = request.data['private'][0]
+    name = request.data['name']
+    private = request.data['private']
+    print(request.data['private'])
     cover = request.data['cover']
+    cover = request.data['cover_url']
     try:
         collection = Collection.objects.create(
             user=user,
@@ -310,6 +312,8 @@ def create_collection(request):
 
         return Response(serializer.data)
     except IntegrityError as e:
-        print(e)
         return Response('A collection With the same name already exists', status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        print(e)
+        return Response(e, status=status.HTTP_400_BAD_REQUEST)
 

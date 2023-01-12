@@ -29,7 +29,7 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['showyourwork.up.railway.app', '127.0.0.1']
+ALLOWED_HOSTS = ['showyourwork.up.railway.app', '127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -149,25 +149,24 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # local database
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': config('DATABASES_NAME'),
-#         'USER': 'postgres',
-#         'PASSWORD': config('DATABASES_PASSWORD'),
-#         'HOST': 'localhost',
-#         'PORT': '5432'
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DATABASES_NAME'),
+        'USER': 'postgres',
+        'PASSWORD': config('DATABASES_PASSWORD'),
+        'HOST': 'localhost',
+        'PORT': '5432'
+    }
+}
 
 
 # railway database
+# DATABASE_URL = config("DATABASE_URL")
 
-DATABASE_URL = config("DATABASE_URL")
-
-DATABASES = {
-    "default": dj_database_url.config(default=DATABASE_URL, conn_max_age=1800),
-}
+# DATABASES = {
+#     "default": dj_database_url.config(default=DATABASE_URL, conn_max_age=1800),
+# }
 
 # channel layers
 CHANNEL_LAYERS = {
@@ -213,8 +212,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 
-STATIC_URL = "/static/"
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 
