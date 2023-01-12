@@ -15,10 +15,12 @@ from django.core.asgi import get_asgi_application
 from channels.security.websocket import AllowedHostsOriginValidator
 from apps.chats.middleware import JwtAuthMiddlewareStack
 from django.core.asgi import get_asgi_application
+import django
 
 # If DJANGO_SETTINGS_MODULE is unset, default to the local settings
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 
+django.setup()
 # This application object is used by any ASGI server configured to use this file.
 django_application = get_asgi_application()
 
