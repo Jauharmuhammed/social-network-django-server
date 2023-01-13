@@ -149,24 +149,24 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 
 # local database
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DATABASES_NAME'),
-        'USER': 'postgres',
-        'PASSWORD': config('DATABASES_PASSWORD'),
-        'HOST': 'localhost',
-        'PORT': '5432'
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': config('DATABASES_NAME'),
+#         'USER': 'postgres',
+#         'PASSWORD': config('DATABASES_PASSWORD'),
+#         'HOST': 'localhost',
+#         'PORT': '5432'
+#     }
+# }
 
 
 # railway database
-# DATABASE_URL = config("DATABASE_URL")
+DATABASE_URL = config("DATABASE_URL")
 
-# DATABASES = {
-#     "default": dj_database_url.config(default=DATABASE_URL, conn_max_age=1800),
-# }
+DATABASES = {
+    "default": dj_database_url.config(default=DATABASE_URL, conn_max_age=1800),
+}
 
 # channel layers
 CHANNEL_LAYERS = {
