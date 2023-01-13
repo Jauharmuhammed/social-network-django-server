@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=2221
+      - POSTGRES_DB=social-network
+    volumes:
+      - db-data:/var/lib/postgresql/data/
+    ports:
+      - "5432"
+
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgres://postgres:2221@db:5432/social-network
+      # - REDIS_URL=redis://redis:6379/0
+
+  # redis:
+  #   image: redis
+
+volumes:
+  db-data:

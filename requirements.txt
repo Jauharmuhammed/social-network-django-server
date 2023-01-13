@@ -35,7 +35,7 @@ incremental==22.10.0
 oauth2==1.9.0.post1
 Pillow==9.3.0
 protobuf==4.21.12
-psycopg2-binary==2.9.5
+psycopg2==2.9.3
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
 pycodestyle==2.10.0
