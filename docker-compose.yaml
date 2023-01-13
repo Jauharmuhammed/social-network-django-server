@@ -23,10 +23,12 @@ services:
       - db
     environment:
       - DATABASE_URL=postgres://postgres:2221@db:5432/social-network
-      # - REDIS_URL=redis://redis:6379/0
+      - REDIS_URL=redis://redis:6379/0
 
-  # redis:
-  #   image: redis
+  redis:
+    image: redis
+    ports:
+      - "6379"
 
 volumes:
   db-data:
