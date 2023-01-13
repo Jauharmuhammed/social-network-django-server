@@ -40,7 +40,7 @@ class CollectionSerializer(serializers.ModelSerializer):
     cover = serializers.SerializerMethodField()
     class Meta:
         model = Collection
-        fields = [ 'name', 'slug', 'user', 'posts', 'cover', 'collaborators', 'created', 'updated', 'active', 'private', 'profile_pic']
+        fields = [ 'id', 'name', 'slug', 'user', 'posts', 'cover', 'collaborators', 'created', 'updated', 'active', 'private', 'profile_pic']
 
     def get_cover(self, obj):
         if obj.cover:

@@ -20,6 +20,7 @@ urlpatterns = [
     path('comment/like/<str:id>/', views.like_comment, name='like_comment'),
 
     path('collection/create/', views.create_collection, name='create_collection'),
+    path('collection/edit/<slug:slug>/', views.edit_collection, name='edit_collection'),
     path('collections/<str:username>/', views.collections_by_user, name='collections_by_user'),
     path('collection/<str:username>/<slug:slug>/', views.posts_by_collection, name='posts_by_collection'),
 

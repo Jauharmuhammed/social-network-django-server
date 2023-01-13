@@ -92,19 +92,20 @@ class Collection(models.Model):
       unique_together = 'user', 'slug'
 
     def __str__(self):
-        return self.name
+        return self.slug
 
     def get_user_profile_pic(self):
         return self.user.userprofile.get_profile_pic()
 
     def get_remote_image(self):
         if self.cover_url and not self.cover:
-            result = request.urlretrieve(self.cover_url[0])
+            result = request.urlretrieve(self.cover_url)
             self.cover.save(
-                    os.path.basename(f'{self.cover_url[0]}.jpg'),
+                    os.path.basename(f'{self.cover_url}.jpg'),
                     File(open(result[0], 'rb'))
                     )
     
     def save(self, *args, **kwargs):
+        print('custom save function')
         self.get_remote_image()
         super().save(*args, **kwargs) 

@@ -293,20 +293,60 @@ def remove_from_collection(request, collection_slug, post_id):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_collection(request):
-    print(request.data['cover_url'])
     user = request.user
     name = request.data['name']
     private = request.data['private']
-    print(request.data['private'])
     cover = request.data['cover']
-    cover = request.data['cover_url']
+    cover_url = request.data['cover_url']
+
     try:
-        collection = Collection.objects.create(
-            user=user,
-            name=name,
-            private=private,
-            cover=cover,
-        )
+        if cover != 'null':
+            print('HI')
+            collection = Collection.objects.create(
+                user=user,
+                name=name,
+                private=private,
+                cover=cover,
+            )
+        else:
+            print('HI')
+            collection = Collection.objects.create(
+                user=user,
+                name=name,
+                private=private,
+            )
+        
+        collection.cover_url = cover_url
+        collection.save()
+
+        serializer = CollectionSerializer(collection)
+
+        return Response(serializer.data)
+    except IntegrityError as e:
+        return Response('A collection With the same name already exists', status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        print(e)
+        return Response(e, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def edit_collection(request, slug):
+    user = request.user
+
+    try:
+        collection = Collection.objects.filter(slug=slug, user=user).first()
+        print(collection)
+        if 'name' in request.data:
+            collection.name=request.data['name']
+            collection.save()
+        if 'cover' in request.data:
+            collection.cover=request.data['cover']
+            collection.save()
+        if 'private' in request.data:
+            collection.private=request.data['private']
+            collection.save()
+
 
         serializer = CollectionSerializer(collection)
 
