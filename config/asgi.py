@@ -18,6 +18,7 @@ import django
 
 # If DJANGO_SETTINGS_MODULE is unset, default to the local settings
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+django.setup()
 
 # This application object is used by any ASGI server configured to use this file.
 django_application = get_asgi_application()
@@ -28,7 +29,6 @@ from . import routing  # noqa isort:skip
 from channels.routing import ProtocolTypeRouter, URLRouter  # noqa isort:skip
 from apps.chats.middleware import JwtAuthMiddlewareStack 
 
-django.setup()
 application = ProtocolTypeRouter(
     {
         "http": django_application,
