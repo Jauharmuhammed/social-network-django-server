@@ -13,8 +13,9 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 import os
 from pathlib import Path
 from datetime import timedelta
-from decouple import config
-import dj_database_url
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -24,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config("SECRET_KEY")
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -155,18 +156,12 @@ DATABASES = {
         'NAME': 'social-network',
         'USER': 'postgres',
         'PASSWORD': 2221,
-        'HOST': 'db',
+        'HOST': 'localhost',
         'PORT': '5432'
     }
 }
 
 
-# railway database
-# DATABASE_URL = config("DATABASE_URL")
-
-# DATABASES = {
-#     "default": dj_database_url.config(default=DATABASE_URL, conn_max_age=1800),
-# }
 
 # channel layers
 # CHANNEL_LAYERS = {
@@ -255,8 +250,8 @@ CORS_ALLOWED_ORIGINS = [
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = True
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 
@@ -264,9 +259,9 @@ ACCOUNT_EMAIL_VERIFICATION = 'none'
 # cloudinary storage for media files (Images Uploaded, Posts, Profile pictures)
 
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': config('CLOUD_NAME'),
-    'API_KEY': config('API_KEY'),
-    'API_SECRET': config('API_SECRET'),
+    'CLOUD_NAME': os.environ.get('CLOUD_NAME'),
+    'API_KEY': os.environ.get('API_KEY'),
+    'API_SECRET': os.environ.get('API_SECRET'),
 }
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 

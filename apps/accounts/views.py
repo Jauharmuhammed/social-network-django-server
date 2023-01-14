@@ -12,7 +12,6 @@ from apps.accounts.models import CustomUser, UserProfile
 from .serializers import UserSerializer, RegisterSerializer, UserProfileSerializer
 
 import datetime
-from decouple import config
 
 from django.template.loader import render_to_string
 
@@ -34,6 +33,10 @@ from channels.layers import get_channel_layer
 from apps.notifications.models import Notification
 from apps.notifications.serializers import NotificationSerializer
 
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
 @api_view(['GET'])
 def getRoutes(request):
     routes = [
@@ -53,8 +56,8 @@ def get_tokens_for_user(user):
     refreshToken = RefreshToken.for_user(user)
     accessToken = refreshToken.access_token
 
-    decodeAccess = jwt.decode(str(accessToken), config('SECRET_KEY'), algorithms=["HS256"]);
-    decodeRefresh = jwt.decode(str(refreshToken), config('SECRET_KEY'), algorithms=["HS256"]);
+    decodeAccess = jwt.decode(str(accessToken), os.environ.get('SECRET_KEY'), algorithms=["HS256"]);
+    decodeRefresh = jwt.decode(str(refreshToken), os.environ.get('SECRET_KEY'), algorithms=["HS256"]);
 
     # add payload here!!
     decodeAccess['username'] = user.username
@@ -71,8 +74,8 @@ def get_tokens_for_user(user):
     decodeRefresh['name'] = user.userprofile.get_full_name()
 
     #encode
-    encodedAccess = jwt.encode(decodeAccess, config('SECRET_KEY'), algorithm="HS256")
-    encodedRefresh = jwt.encode(decodeRefresh, config('SECRET_KEY'), algorithm="HS256")
+    encodedAccess = jwt.encode(decodeAccess, os.environ.get('SECRET_KEY'), algorithm="HS256")
+    encodedRefresh = jwt.encode(decodeRefresh, os.environ.get('SECRET_KEY'), algorithm="HS256")
 
     token = {
         'refresh': str(encodedRefresh),
@@ -261,8 +264,8 @@ class SendOtpView(APIView):
           try:
             request.session['mobile_number'] = mobile_number
 
-            account_sid = config('TWILIO_ACCOUNT_SID')
-            auth_token = config('TWILIO_AUTH_TOKEN')
+            account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
+            auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
             client = Client(account_sid,auth_token)
 
             verification = client.verify \
@@ -286,8 +289,8 @@ class LoginWithOtpView(APIView):
 
         print(otp, mobile_number)
 
-        account_sid = config('TWILIO_ACCOUNT_SID')
-        auth_token = config('TWILIO_AUTH_TOKEN')
+        account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
+        auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
         client = Client(account_sid, auth_token)
 
         verification_check = client.verify \
