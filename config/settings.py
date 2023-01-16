@@ -30,7 +30,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['20.168.24.45', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['showyourwork.jauharmuhammed.com', '13.233.146.125', '127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -241,8 +241,14 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
-    "https://showyourwork.netlify.app"
+    "https://showyourwork.netlify.app",
+    "http://showyourwork.netlify.app",
+    "https://showyourwork.jauharmuhammed.com"
 ]
+
+CSRF_TRUSTED_ORIGINS = ['https://showyourwork.jauharmuhammed.com']
+
+
 
 
 # SMTP configuration
