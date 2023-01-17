@@ -329,6 +329,7 @@ def profile(request, username):
 
         is_following = True  if request.user in user_profile.followers.all() else False
         is_current_user = True  if request.user == user else False
+        mobile_number = user.mobile_number
 
         
 
@@ -338,8 +339,34 @@ def profile(request, username):
 
         # # follwing list
         # following = user.following.all()
-        data.update({'is_following':is_following, 'is_current_user': is_current_user})
+        data.update({'is_following':is_following, 'is_current_user': is_current_user, 'mobile_number': mobile_number})
         return Response(data )
+        
+    except Exception as e:
+        message = {'detail':f'{e}'}
+        return Response(message,status=status.HTTP_204_NO_CONTENT)
+
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def profile_update(request):
+    user = CustomUser.objects.get(email=request.user)
+    try:
+        if user.id != int(request.data['id']): return Response(status=status.HTTP_403_FORBIDDEN)
+
+        request.data['email'] = user.email
+        print(request.data)
+
+        serializer = UserSerializer(instance=user, data=request.data)
+        if serializer.is_valid():
+            print(serializer.data, 'hdsfhlakhfkdj')
+        else:
+            print(serializer.errors)
+        
+
+
+        return Response(' ')
         
     except Exception as e:
         message = {'detail':f'{e}'}
