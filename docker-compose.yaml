@@ -14,11 +14,11 @@ services:
 
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    expose:      
+     - "8000"
+    command: /usr/local/bin/gunicorn docker_django.wsgi:application -w 2 -b :8000
     volumes:
       - .:/code
-    ports:
-      - "8000:8000"
     depends_on:
       - db
     environment:
