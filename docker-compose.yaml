@@ -16,7 +16,7 @@ services:
     build: .
     expose:      
      - "8000"
-    command: daphne -b 0.0.0.0 -p 8001 myproject.asgi:application
+    command: daphne config.asgi:application -b 0.0.0.0 -p 8000
     volumes:
       - .:/code
     depends_on:
