@@ -243,7 +243,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8000",
     "https://showyourwork.netlify.app",
     "http://showyourwork.netlify.app",
-    "https://showyourwork.netlify.app",
+    "wss://showyourwork.netlify.app",
 ]
 
 CSRF_TRUSTED_ORIGINS = ['https://showyourworkapi.jauharmuhammed.com']
