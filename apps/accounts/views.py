@@ -355,18 +355,25 @@ def profile_update(request):
     try:
         if user.id != int(request.data['id']): return Response(status=status.HTTP_403_FORBIDDEN)
 
-        request.data['email'] = user.email
-        print(request.data)
+        profile = UserProfile.objects.filter(user=user).first()
+        profile.bio = request.data['bio']
+        try:
+            print(request.data['profile_picture'])
+            profile.profile_picture = request.data['profile_picture']
+        except:
+            pass
 
-        serializer = UserSerializer(instance=user, data=request.data)
-        if serializer.is_valid():
-            print(serializer.data, 'hdsfhlakhfkdj')
-        else:
-            print(serializer.errors)
-        
+        profile.save()
 
+        user.first_name = request.data['first_name']
+        user.last_name = request.data['last_name']
+        user.username = request.data['username']
+        user.mobile_number = request.data['mobile_number']
+        user.save()
 
-        return Response(' ')
+        serializer = UserProfileSerializer(user.userprofile)
+
+        return Response(serializer.data)
         
     except Exception as e:
         message = {'detail':f'{e}'}

@@ -78,6 +78,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     followings_count = serializers.CharField(source='get_followings_count')
     full_name = serializers.CharField(source='get_full_name')
     following = serializers.ListField(source='get_following')
+    email = serializers.SerializerMethodField(read_only=True)
     class Meta:
         model = UserProfile
         exclude = ['profile_picture', 'profile_picture_url']
@@ -88,4 +89,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
         except:
             pic = 'https://res.cloudinary.com/dpofqivee/image/upload/v1672380610/social_network/profile_picture/profile_nloi7m.jpg'
         return pic
+
+
+    def get_email(self, obj):
+        return obj.user.email
 
