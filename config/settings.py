@@ -236,16 +236,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # Configure the cors middleware’s behaviour in your Django settings. 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
-    "https://showyourwork.netlify.app",
-    "http://showyourwork.netlify.app",
-    "wss://showyourwork.netlify.app",
-    "ws://showyourwork.netlify.app",
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:3000",
+#     "http://127.0.0.1:3000",
+#     "http://localhost:8000",
+#     "http://127.0.0.1:8000",
+#     "https://showyourwork.netlify.app",
+#     "http://showyourwork.netlify.app",
+#     "wss://showyourwork.netlify.app",
+#     "ws://showyourwork.netlify.app",
+# ]
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 CSRF_TRUSTED_ORIGINS = ['https://showyourworkapi.jauharmuhammed.com']
 
