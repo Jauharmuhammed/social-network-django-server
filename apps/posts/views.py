@@ -266,7 +266,7 @@ def save_to_collection(request, collection_slug, post_id):
         return Response(serializer.data)
 
     except Exception as e:
-        return Response(e)
+        return Response(str(e))
 
 
 @api_view(['POST'])
