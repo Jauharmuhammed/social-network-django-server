@@ -156,7 +156,7 @@ DATABASES = {
         'NAME': 'social-network',
         'USER': 'postgres',
         'PASSWORD': 2221,
-        'HOST': 'db',
+        'HOST': 'localhost',
         'PORT': '5432'
     }
 }
@@ -164,17 +164,17 @@ DATABASES = {
 
 
 # channel layers
-# CHANNEL_LAYERS = {
-#     'default':{
-#         'BACKEND':'channels.layers.InMemoryChannelLayer'
-#     }
-# }
+CHANNEL_LAYERS = {
+    'default':{
+        'BACKEND':'channels.layers.InMemoryChannelLayer'
+    }
+}
 
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("redis", 6379)],
+            "hosts": [("localhost", 6379)],
         },
     },
 }
@@ -236,16 +236,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
 # Configure the cors middleware’s behaviour in your Django settings. 
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:3000",
-#     "http://127.0.0.1:3000",
-#     "http://localhost:8000",
-#     "http://127.0.0.1:8000",
-#     "https://showyourwork.netlify.app",
-#     "http://showyourwork.netlify.app",
-#     "wss://showyourwork.netlify.app",
-#     "ws://showyourwork.netlify.app",
-# ]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    "https://showyourwork.netlify.app",
+    "http://showyourwork.netlify.app",
+    "wss://showyourwork.netlify.app",
+    "ws://showyourwork.netlify.app",
+]
 
 CORS_ALLOW_ALL_ORIGINS = True
 
