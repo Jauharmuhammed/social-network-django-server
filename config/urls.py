@@ -14,4 +14,4 @@ urlpatterns = [
     path('api/', include('apps.notifications.urls')),
     path('api/', include('apps.accounts.urls')),
 
-]
+]+static(settings.STATIC_URL,document_root=settings.STATIC_ROOT)
