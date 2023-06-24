@@ -14,7 +14,6 @@ def create_profile(sender, instance, created, **kwargs):
         if instance.last_name: profile.last_name = instance.last_name
         profile.save()
 
-        print('Profile Created!')
 
 @receiver(post_save, sender=CustomUser)
 def create_profile(sender, instance, created, **kwargs):
@@ -26,5 +25,5 @@ def create_profile(sender, instance, created, **kwargs):
             profile.last_name = instance.last_name
             profile.username = instance.username
             profile.save()
-    except:
+    except Exception as e:
             pass
